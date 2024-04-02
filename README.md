@@ -4,3 +4,8 @@
 
 ## Supported
 - **Multithreading**
+- **Tracking active sessions**
+
+## How to use?
+  The connection is made through SAP SCRIPT.
+  Write a script using your own SAPGUI, note that the file uses the VBA language to record the paths of the SAP components, use these paths to use the functions of this python project.
