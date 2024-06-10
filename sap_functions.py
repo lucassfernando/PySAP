@@ -36,7 +36,7 @@ class SapFunctions():
             
             return False
 
-    def sessions_active(self):  #CHECK THE TOTAL OF ACTIVE WINDOWS
+    def sessions_active(self):  #VERIFICA O TOTAL DE JANELAS ATIVAS
         sapgui = win32com.client.GetObject('SAPGUI').GetScriptingEngine
         sessions_list = []
         
@@ -46,7 +46,7 @@ class SapFunctions():
         
         return sessions_list
             
-    #VARIOUS FUNCTIONS TO PERFORM WITHIN SAP LOGO BELOW (ALWAYS BEING UPDATED)
+    #DIVERSAS FUNÇÕES PARA REALIZAR DENTRO DO SAP LOGO ABAIXO (SEMPRE SENDO ATUALIZADO)
 
     def tab_close(self):
         self.session.findById("wnd[0]").close()
@@ -89,6 +89,9 @@ class SapFunctions():
     
     def select_box_button(self, button_path, true_or_false_option):
         self.session.findById(button_path).selected = true_or_false_option
+
+    def modify_check_box(self, button_path, box_position, box_name, true_or_false_option):
+        self.session.findById(button_path).modifyCheckbox(int(box_position), box_name, true_or_false_option)
     
     def double_click_item(self, button_path, item, item_postion):
         self.session.findById(button_path).doubleClickItem(item, item_postion)
@@ -113,3 +116,17 @@ class SapFunctions():
 
     def scroll_bar_position(self, button_path, value):
         self.session.findById(button_path).verticalScrollbar.position = value
+
+    def press_button(self, button_path, button_name):
+        self.session.findById(button_path).pressButton(button_name)
+    
+    def get_cell_value(self, button_path, cell, field_name):
+        cell_value = self.session.findById(button_path).GetCellValue(int(cell), field_name)
+        return cell_value
+    
+    def context_menu_select_item(self, button_path, item):
+        self.session.findById(button_path).contextMenu()
+        self.session.findById(button_path).selectContextMenuItem(item)
+
+    def get_absolute_row(self, button_path, line, true_or_false):
+        self.session.findById(button_path).getAbsoluteRow(line).selected = true_or_false
