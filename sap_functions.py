@@ -11,30 +11,25 @@ class SapFunctions():
         self.username = username
         self.password = password
 
+    @log_error
     def login(self):
 
         pythoncom.CoInitialize()
 
-        path = r"C:\Program Files (x86)\SAP\FrontEnd\SAPgui\saplogon.exe"
+        path = "C:\\Program Files\\SAP\\FrontEnd\\SAPGUI\\saplogon.exe"
         subprocess.Popen(path)
 
         sleep(10)
 
-        try:
+        sapgui = win32com.client.GetObject('SAPGUI').GetScriptingEngine
+        connection = sapgui.OpenConnection(self.server_name, True)
 
-            sapgui = win32com.client.GetObject('SAPGUI').GetScriptingEngine
-            connection = sapgui.OpenConnection(self.server_name, True)
+        self.session = connection.Children(0)
+        self.session.findById("wnd[0]/usr/txtRSYST-BNAME").text = self.username
+        self.session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = self.password
+        self.session.findById("wnd[0]").sendVKey(0)
 
-            self.session = connection.Children(0)
-            self.session.findById("wnd[0]/usr/txtRSYST-BNAME").text = self.username
-            self.session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = self.password
-            self.session.findById("wnd[0]").sendVKey(0)
-
-            return True
-        
-        except:
-            
-            return False
+        return True
 
     def sessions_active(self):  #VERIFICA O TOTAL DE JANELAS ATIVAS
         sapgui = win32com.client.GetObject('SAPGUI').GetScriptingEngine
@@ -45,7 +40,17 @@ class SapFunctions():
             sessions_list.append(f'Session: {connection.Name} | Server: {connection.Description}')
         
         return sessions_list
-            
+    
+    def detect_any_window(self):
+        sleep(1)
+        try:
+            for i in range(1, 5):
+                window_id = f"wnd[{i}]"
+                self.session.findById(window_id)
+                return True
+        except:
+            return False
+        
     #DIVERSAS FUNÇÕES PARA REALIZAR DENTRO DO SAP LOGO ABAIXO (SEMPRE SENDO ATUALIZADO)
 
     def tab_close(self):
@@ -107,9 +112,18 @@ class SapFunctions():
     
     def current_cell_column(self, button_path, selected_cell):
         self.session.findById(button_path).currentCellColumn = selected_cell
+
+    def select_column(self, button_path, selected_cell):
+        self.session.findById(button_path).selectColumn(selected_cell)
+
+    def current_cell_row(self, button_path, selected_row):
+        self.session.findById(button_path).currentCellRow = int(selected_row)
     
     def click_current_cell(self, button_path):
         self.session.findById(button_path).clickCurrentCell()
+
+    def double_click_current_cell(self, button_path):
+        self.session.findById(button_path).doubleClickCurrentCell()
     
     def modify_cell(self, button_path, cell_position, cell_name, text):
         self.session.findById(button_path).modifyCell(int(cell_position), cell_name, text)
@@ -130,3 +144,10 @@ class SapFunctions():
 
     def get_absolute_row(self, button_path, line, true_or_false):
         self.session.findById(button_path).getAbsoluteRow(line).selected = true_or_false
+
+    def set_current_cell(self, button_path, cell, field_name):
+        self.session.findById(button_path).setCurrentCell(int(cell), field_name)
+    
+    def select_node(self, button_path, node):
+        self.session.findById(button_path).selectedNode = f'{node}'
+
